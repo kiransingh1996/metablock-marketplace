@@ -5,6 +5,7 @@
       'openseauserdata.com',
       'brand.assets.adidas.com',
       'media0.giphy.com',
+      'media.giphy.com',
       'avatars.dicebear.com',
       'media1.giphy.com',
       'media3.giphy.com',
