@@ -17,7 +17,7 @@ const Card = ({ item }) => {
       className={styles.cardContainer}
       onClick={() => buyAsset(item.price, item)}
     >
-      <div className={styles.card}>
+      <div className={styles.card} >
         <Image
           src={item.src}
           className='object-cover object-center'

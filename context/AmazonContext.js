@@ -97,10 +97,8 @@ export const AmazonProvider = ({ children }) => {
 
     const amount = ethers.BigNumber.from(tokenAmount)
     const price = ethers.BigNumber.from('100000000000')
-    const calcPrice = amount.mul(price)
-
-    console.log(amazonCoinAddress)
-
+    const calcPrice = amount.mul(price) 
+    debugger;
     let options = {
       contractAddress: amazonCoinAddress,
       functionName: 'mint',
@@ -111,9 +109,10 @@ export const AmazonProvider = ({ children }) => {
       },
     }
     const transaction = await Moralis.executeFunction(options)
+    debugger;
     const receipt = await transaction.wait()
     setIsLoading(false)
-    console.log(receipt)
+    
     setEtherscanLink(
       `https://ropsten.etherscan.io/tx/${receipt.transactionHash}`,
     )
@@ -147,8 +146,7 @@ export const AmazonProvider = ({ children }) => {
 
       if (isWeb3Enabled) {
         const response = await Moralis.executeFunction(options)
-        console.log((response/1000000000000000000))
-        setBalance((response).toString())
+        setBalance((response/1000000000000000000).toFixed())
       }
     } catch (error) {
       console.log(error)
@@ -157,11 +155,7 @@ export const AmazonProvider = ({ children }) => {
 
   const buyAsset = async (price, asset) => {
     try {
-      if (!isAuthenticated) return
-      console.log('price: ', price)
-      console.log('asset: ', asset.name)
-      console.log(userData)
-
+      if (!isAuthenticated) return  
       const options = {
         type: 'erc20',
         amount: price,
@@ -172,11 +166,7 @@ export const AmazonProvider = ({ children }) => {
       let transaction = await Moralis.transfer(options)
       const receipt = await transaction.wait()
 
-      if (receipt) {
-        //You can do this but it's not necessary with Moralis hooks!
-        // const query = new Moralis.Query('_User')
-        // const results = await query.find()
-
+      if (receipt) { 
         const res = userData[0].add('ownedAssets', {
           ...asset,
           purchaseDate: Date.now(),
@@ -213,10 +203,7 @@ export const AmazonProvider = ({ children }) => {
   }
 
   const getOwnedAssets = async () => {
-    try {
-      // let query = new Moralis.Query('_User')
-      // let results = await query.find()
-
+    try { 
       if (userData[0]) {
         setOwnedItems(prevItems => [
           ...prevItems,
