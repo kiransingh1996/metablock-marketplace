@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { IoMdSearch } from 'react-icons/io'
 import { AmazonContext } from '../context/AmazonContext'
 import { FaCoins } from 'react-icons/fa'
+import Link from 'next/link'
 import {
   ModalProvider,
   Modal,
@@ -54,22 +55,23 @@ const Header = () => {
             <div
               className={(styles.balance, styles.menuItem)}
               onClick={openModal}
-            >
-              {balance}
-              <FaCoins className={styles.coins} />
-              <Modal isOpen={isModalOpen} transition={ModalTransition.SCALE}>
+            > 
+                {balance} MBC
+                <FaCoins className={styles.coins} /> 
+              
+              {/* <Modal isOpen={isModalOpen} transition={ModalTransition.SCALE}>
                 <BuyModal close={closeModal} buyTokens={buyTokens} />
-              </Modal>
+              </Modal> */}
             </div>
           ) : (
             <div
               className={(styles.balance, styles.menuItem)}
               onClick={openModal}
-            >
-              0 AC <FaCoins className={styles.coins} />
-              <Modal isOpen={isModalOpen} transition={ModalTransition.SCALE}>
+            > 
+              0 MBC <FaCoins className={styles.coins} /> 
+              {/* <Modal isOpen={isModalOpen} transition={ModalTransition.SCALE}>
                 <BuyModal close={closeModal} buyTokens={buyTokens} />
-              </Modal>
+              </Modal> */}
             </div>
           )}
           <CgMenuGridO fontSize={30} className={styles.menuItem} />

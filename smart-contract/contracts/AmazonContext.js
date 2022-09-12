@@ -38,42 +38,19 @@ export const AmazonProvider = ({ children }) => {
     data: assetsData,
     error: assetsDataError,
     isLoading: assetsDataIsLoading,
-  } = useMoralisQuery('assets')
-
-  const getBalance = async () => {
-    try {
-      if (!isAuthenticated || !currentAccount) return
-      const options = {
-        contractAddress: amazonCoinAddress,
-        functionName: 'balanceOf',
-        abi: amazonAbi,
-        params: {
-          account: currentAccount,
-        },
-      }
-
-      if (isWeb3Enabled) {
-        const response = await Moralis.executeFunction(options) 
-        setBalance((response/1000000000000000000).toFixed(4))
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-  useEffect(() => { 
-    ;(async()=>{  
-      if(isWeb3Enabled){
-        await getAssets()
-        await getOwnedAssets()
-      }
-      else{
-        await enableWeb3()
-      }
-    })();
-  }, [ isAuthenticated, userData, assetsData, assetsDataIsLoading, userDataIsLoading]);
+  } = useMoralisQuery('Assets')
 
   useEffect(() => {
-    ;(async()=>{
+    (async()=>{
+    console.log(assetsData)
+    await enableWeb3()
+    await getAssets()
+    await getOwnedAssets()
+    })();
+  }, [userData, assetsData, assetsDataIsLoading, userDataIsLoading]);
+
+  useEffect(() => {
+    (async()=>{
       if (!isWeb3Enabled) {
         await enableWeb3()
       }
@@ -97,7 +74,6 @@ export const AmazonProvider = ({ children }) => {
     isWeb3Enabled,
     isAuthenticated,
     balance,
-    getBalance,
     setBalance,
     authenticate,
     currentAccount,
@@ -116,28 +92,27 @@ export const AmazonProvider = ({ children }) => {
       await connectWallet()
     }
 
-    alert(amazonCoinAddress)
     const amount = ethers.BigNumber.from(tokenAmount)
-    const price = ethers.BigNumber.from('100000000000000')
-    const calcPrice = amount.mul(price)  
-    alert(amount) 
+    const price = ethers.BigNumber.from('100000000000')
+    const calcPrice = amount.mul(price)
+
+    console.log(amazonCoinAddress)
+
     let options = {
       contractAddress: amazonCoinAddress,
-      functionName: 'transfer',
+      functionName: 'mint',
       abi: amazonAbi,
       msgValue: calcPrice,
       params: {
-        to:currentAccount,
-        amount:amount,
+        amount,
       },
     }
     const transaction = await Moralis.executeFunction(options)
-    debugger;
     const receipt = await transaction.wait()
     setIsLoading(false)
-    
+    console.log(receipt)
     setEtherscanLink(
-      `https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`,
+      `https://ropsten.etherscan.io/tx/${receipt.transactionHash}`,
     )
   }
 
@@ -155,32 +130,50 @@ export const AmazonProvider = ({ children }) => {
     }
   }
 
-  
+  const getBalance = async () => {
+    try {
+      if (!isAuthenticated || !currentAccount) return
+      const options = {
+        contractAddress: amazonCoinAddress,
+        functionName: 'balanceOf',
+        abi: amazonAbi,
+        params: {
+          account: currentAccount,
+        },
+      }
+
+      if (isWeb3Enabled) {
+        const response = await Moralis.executeFunction(options)
+        console.log(response.toString())
+        setBalance(response.toString())
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const buyAsset = async (price, asset) => {
-
     try {
-      if (!isAuthenticated) return  
+      if (!isAuthenticated) return
+      console.log('price: ', price)
+      console.log('asset: ', asset.name)
+      console.log(userData)
+
       const options = {
         type: 'erc20',
-        amount: ethers.utils.parseEther(price),
-        receiver: '0x252b0C412414a21b3411B3d6b5887d0F414E40A3',
+        amount: price,
+        receiver: amazonCoinAddress,
         contractAddress: amazonCoinAddress,
-      } 
+      }
 
-      // let options = {
-      //   contractAddress: amazonCoinAddress,
-      //   receiver: amazonCoinAddress,
-      //   functionName: 'transferCoin',
-      //   abi: amazonAbi, 
-      //   params: {
-      //     to:amazonCoinAddress,
-      //     amount:price,
-      //   },
-      // }
-      const transaction = await Moralis.transfer(options)
-      const receipt = await transaction.wait() 
-      if (receipt) { 
+      let transaction = await Moralis.transfer(options)
+      const receipt = await transaction.wait()
+
+      if (receipt) {
+        //You can do this but it's not necessary with Moralis hooks!
+        // const query = new Moralis.Query('_User')
+        // const results = await query.find()
+
         const res = userData[0].add('ownedAssets', {
           ...asset,
           purchaseDate: Date.now(),
@@ -198,7 +191,9 @@ export const AmazonProvider = ({ children }) => {
 
   const getAssets = async () => {
     try {
-      await enableWeb3() 
+      await enableWeb3()
+      // const query = new Moralis.Query('Assets')
+      // const results = await query.find()
 
       setAssets(assetsData)
     } catch (error) {
@@ -217,11 +212,14 @@ export const AmazonProvider = ({ children }) => {
   }
 
   const getOwnedAssets = async () => {
-    try { 
+    try {
+      // let query = new Moralis.Query('_User')
+      // let results = await query.find()
+
       if (userData[0]) {
         setOwnedItems(prevItems => [
           ...prevItems,
-          userData[0].attributes.ownedAssets,
+          userData[0].attributes.ownedAsset,
         ])
       }
     } catch (error) {
