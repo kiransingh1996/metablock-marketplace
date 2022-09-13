@@ -164,7 +164,7 @@ export const AmazonProvider = ({ children }) => {
       const options = {
         type: 'erc20',
         amount: ethers.utils.parseEther(price),
-        receiver: '0x252b0C412414a21b3411B3d6b5887d0F414E40A3',
+        receiver: '0x252b0C412414a21b3411B3d6b5887d0F414E40A3',//marketing wallet
         contractAddress: amazonCoinAddress,
       } 
 
